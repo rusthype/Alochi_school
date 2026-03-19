@@ -4,7 +4,7 @@ import '../storage/secure_storage.dart';
 class ApiClient {
   static const _baseUrl = String.fromEnvironment(
     'API_URL',
-    defaultValue: 'http://localhost:8000',
+    defaultValue: 'https://api.alochi.uz',
   );
   late final Dio _dio;
 

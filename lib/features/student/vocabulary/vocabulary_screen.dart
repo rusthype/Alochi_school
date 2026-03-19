@@ -47,7 +47,7 @@ class _State extends State<VocabularyScreen> {
       _mode = 'flashcard';
     });
     // try real API
-    studentApi.getVocabularyWords(topic['id'] as String).then((w) {
+    studentApi.getVocabularyWords(topic['id']?.toString() ?? '').then((w) {
       if (mounted && w.isNotEmpty) setState(() => _currentWords = w.cast<Map>());
     }).catchError((_) {});
   }
@@ -79,9 +79,9 @@ class _State extends State<VocabularyScreen> {
           separatorBuilder: (_, __) => const SizedBox(width: 8),
           itemBuilder: (_, i) {
             final b = _books[i];
-            final active = _selectedBook == b['id'];
+            final active = _selectedBook == b['id']?.toString();
             return GestureDetector(
-              onTap: () => setState(() => _selectedBook = b['id'] as String?),
+              onTap: () => setState(() => _selectedBook = b['id']?.toString()),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(

@@ -14,7 +14,7 @@ class TestPlayScreen extends StatefulWidget {
 class _State extends State<TestPlayScreen> {
   Map _test = {};
   List _questions = [];
-  Map<int, int> _answers = {};
+  Map<String, int> _answers = {};
   int _currentPage = 0;
   bool _submitting = false;
   Timer? _timer;
@@ -154,7 +154,7 @@ class _State extends State<TestPlayScreen> {
                     onPageChanged: (i) => setState(() => _currentPage = i),
                     itemBuilder: (_, i) {
                       final q = _questions[i] as Map;
-                      final qId = q['id'] as int;
+                      final qId = q['id']?.toString() ?? '';
                       final opts = (q['options'] as List).cast<String>();
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),

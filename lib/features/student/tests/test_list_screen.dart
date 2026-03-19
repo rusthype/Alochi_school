@@ -67,9 +67,9 @@ class _State extends State<TestListScreen> {
                 separatorBuilder: (_, __) => const SizedBox(width: 8),
                 itemBuilder: (_, i) {
                   final b = _books[i];
-                  final active = _selectedBook == b['id'];
+                  final active = _selectedBook == b['id']?.toString();
                   return GestureDetector(
-                    onTap: () { setState(() => _selectedBook = b['id'] as String?); _load(); },
+                    onTap: () { setState(() => _selectedBook = b['id']?.toString()); _load(); },
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       decoration: BoxDecoration(

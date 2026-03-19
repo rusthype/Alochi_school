@@ -62,7 +62,7 @@ jobs:
         with: { flutter-version: '3.27.4', channel: stable, cache: true }
       - run: flutter pub get
       - run: flutter config --enable-macos-desktop
-      - run: flutter build macos --release
+      - run: flutter build macos --release --dart-define=API_URL=https://api.alochi.uz
       - name: Zip macOS app
         run: |
           cd build/macos/Build/Products/Release

@@ -3,7 +3,7 @@ import '../storage/secure_storage.dart';
 
 class AuthApi {
   Future<Map<String, dynamic>> login(String username, String password) async {
-    final res = await apiClient.post('/auth/login/', data: {
+    final res = await apiClient.post('/auth/login', data: {
       'username': username,
       'password': password,
     });
@@ -16,7 +16,7 @@ class AuthApi {
   }
 
   Future<Map<String, dynamic>> getMe() async {
-    final res = await apiClient.get('/users/me/');
+    final res = await apiClient.get('/users/me');
     return res.data as Map<String, dynamic>;
   }
 
@@ -27,7 +27,7 @@ class AuthApi {
       ..remove('is_staff')
       ..remove('is_superuser')
       ..remove('is_active');
-    await apiClient.patch('/users/me/', data: safe);
+    await apiClient.patch('/users/me', data: safe);
   }
 
   Future<void> logout() => SecureStorage.clear();

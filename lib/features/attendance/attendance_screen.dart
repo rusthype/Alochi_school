@@ -13,7 +13,7 @@ class AttendanceScreen extends StatefulWidget {
 class _AttendanceScreenState extends State<AttendanceScreen> {
   String _selectedClass = '11-A';
   DateTime _selectedDate = DateTime.now();
-  Map<int, String> _status = {};
+  Map<String, String> _status = {};
   bool _saving = false;
 
   final _classes = ['11-A', '11-B', '10-A', '10-B', '9-A', '9-B'];
@@ -31,7 +31,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   @override
   void initState() {
     super.initState();
-    for (final s in _mockStudents) { _status[s['id'] as int] = 'present'; }
+    for (final s in _mockStudents) { _status[s['id']?.toString() ?? ''] = 'present'; }
   }
 
   int get _presentCount => _status.values.where((s) => s == 'present').length;
@@ -123,7 +123,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 separatorBuilder: (_, __) => const SizedBox(height: 8),
                 itemBuilder: (_, i) {
                   final s = _mockStudents[i];
-                  final id = s['id'] as int;
+                  final id = s['id']?.toString() ?? '';
                   final current = _status[id] ?? 'present';
                   return Container(
                     padding: const EdgeInsets.all(14),
