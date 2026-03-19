@@ -36,32 +36,52 @@ import '../features/parent/dashboard/parent_dashboard_screen.dart';
 import '../features/parent/children/child_detail_screen.dart';
 import '../features/parent/notifications/parent_notifications_screen.dart';
 
+// Stable ChangeNotifier so GoRouter isn't recreated on every auth state change.
+class _AuthRouterNotifier extends ChangeNotifier {
+  _AuthRouterNotifier(ProviderRef ref) {
+    ref.listen<AuthState>(authProvider, (_, __) => notifyListeners());
+  }
+}
+
 final routerProvider = Provider<GoRouter>((ref) {
-  final auth = ref.watch(authProvider);
+  final notifier = _AuthRouterNotifier(ref);
 
   return GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/',
+    refreshListenable: notifier,
     redirect: (context, state) {
-      final user = auth.user;
+      final auth = ref.read(authProvider);
       final path = state.matchedLocation;
+
+      // Wait for session restore before redirecting anywhere
+      if (!auth.isInitialized) return null;
+
+      final user = auth.user;
       final isLoginRoute = path == '/login';
+      final isSplashRoute = path == '/';
 
       // Not authenticated → login
       if (user == null && !isLoginRoute) return '/login';
 
-      // Authenticated on login page → redirect by role
-      if (user != null && isLoginRoute) {
+      // Authenticated on login/splash → redirect by role
+      if (user != null && (isLoginRoute || isSplashRoute)) {
         return _homeForRole(user['role'] as String? ?? 'school_admin');
       }
 
       // Desktop: block student/parent routes — school only
-      if (isDesktop && !path.startsWith('/school')) {
+      if (isDesktop && !path.startsWith('/school') && !isLoginRoute) {
         return '/school/dashboard';
       }
 
       return null;
     },
     routes: [
+      // ─── SPLASH ───────────────────────────────────────────
+      GoRoute(
+        path: '/',
+        builder: (_, __) => const _SplashScreen(),
+      ),
+
       // ─── AUTH ─────────────────────────────────────────────
       GoRoute(
         path: '/login',
@@ -136,6 +156,15 @@ String _homeForRole(String role) {
     case 'school_admin': return '/school/dashboard';
     default:             return '/school/dashboard';
   }
+}
+
+class _SplashScreen extends StatelessWidget {
+  const _SplashScreen();
+  @override
+  Widget build(BuildContext context) => const Scaffold(
+    backgroundColor: Color(0xFF0D0F1A),
+    body: Center(child: CircularProgressIndicator(color: Color(0xFFF97316))),
+  );
 }
 
 class _Placeholder extends StatelessWidget {
