@@ -43,10 +43,13 @@ jobs:
         run: flutter pub get
       - name: Build Windows
         run: flutter build windows --release --dart-define=API_URL=https://api.alochi.uz
+      - name: Install NSIS
+        run: choco install nsis -y
       - name: Build NSIS installer
         uses: joncloud/makensis-action@v4
         with:
           script-file: windows/installer.nsi
+          arguments: /V3
       - name: Rename installer
         run: mv AlochiMaktab-Setup.exe alochi-maktab-setup-${{ github.ref_name }}.exe
         shell: pwsh
