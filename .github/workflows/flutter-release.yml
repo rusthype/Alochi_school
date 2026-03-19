@@ -9,7 +9,7 @@ permissions:
 
 jobs:
 
-  # ─── MOBILE ───────────────────────────────────────────────
+  # ─── ANDROID ──────────────────────────────────────────────
   android:
     name: Android APK
     runs-on: ubuntu-latest
@@ -21,28 +21,16 @@ jobs:
         with: { flutter-version: '3.27.4', channel: stable, cache: true }
       - run: flutter pub get
       - run: flutter build apk --release
+      - name: Rename APK
+        run: mv build/app/outputs/flutter-apk/app-release.apk alochi-maktab-${{ github.ref_name }}.apk
       - uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: alochi-maktab-${{ github.ref_name }}.apk
 
-  ios:
-    name: iOS IPA
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with: { flutter-version: '3.27.4', channel: stable, cache: true }
-      - run: flutter pub get
-      - run: flutter build ios --release --no-codesign
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ios-build
-          path: build/ios/iphoneos/
-
-  # ─── DESKTOP (school portal only) ────────────────────────
+  # ─── WINDOWS ──────────────────────────────────────────────
   windows:
-    name: Windows EXE (School only)
+    name: Windows EXE
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,13 +39,17 @@ jobs:
       - run: flutter pub get
       - run: flutter config --enable-windows-desktop
       - run: flutter build windows --release
+      - name: Zip Windows build
+        run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath alochi-maktab-windows-${{ github.ref_name }}.zip
+        shell: pwsh
       - uses: actions/upload-artifact@v4
         with:
-          name: windows-exe
-          path: build/windows/x64/runner/Release/
+          name: windows-zip
+          path: alochi-maktab-windows-${{ github.ref_name }}.zip
 
+  # ─── MACOS ────────────────────────────────────────────────
   macos:
-    name: macOS App (School only)
+    name: macOS App
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -66,22 +58,33 @@ jobs:
       - run: flutter pub get
       - run: flutter config --enable-macos-desktop
       - run: flutter build macos --release
+      - name: Zip macOS app
+        run: |
+          cd build/macos/Build/Products/Release
+          zip -r ../../../../../alochi-maktab-macos-${{ github.ref_name }}.zip *.app
       - uses: actions/upload-artifact@v4
         with:
-          name: macos-app
-          path: build/macos/Build/Products/Release/
+          name: macos-zip
+          path: alochi-maktab-macos-${{ github.ref_name }}.zip
 
   # ─── RELEASE ──────────────────────────────────────────────
   release:
-    name: Create GitHub Release
+    name: Publish GitHub Release
     needs: [android, windows, macos]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - name: List downloaded files
+        run: ls -la
       - uses: softprops/action-gh-release@v2
         with:
-          name: "A'lochi ${{ github.ref_name }}"
+          name: "A'lochi Maktab ${{ github.ref_name }}"
+          draft: false
+          prerelease: false
+          generate_notes: true
           files: |
-            android-apk/app-release.apk
-            macos-app/**
-            windows-exe/**
+            alochi-maktab-${{ github.ref_name }}.apk
+            alochi-maktab-windows-${{ github.ref_name }}.zip
+            alochi-maktab-macos-${{ github.ref_name }}.zip
