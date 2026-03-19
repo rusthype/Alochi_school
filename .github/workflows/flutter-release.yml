@@ -20,7 +20,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with: { flutter-version: '3.27.4', channel: stable, cache: true }
       - run: flutter pub get
-      - run: flutter build apk --release
+      - run: flutter build apk --release --dart-define=API_URL=https://api.alochi.uz
       - name: Rename APK
         run: mv build/app/outputs/flutter-apk/app-release.apk alochi-maktab-${{ github.ref_name }}.apk
       - uses: actions/upload-artifact@v4
@@ -30,7 +30,7 @@ jobs:
 
   # ─── WINDOWS ──────────────────────────────────────────────
   windows:
-    name: Windows EXE
+    name: Windows Installer
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,14 +38,19 @@ jobs:
         with: { flutter-version: '3.27.4', channel: stable, cache: true }
       - run: flutter pub get
       - run: flutter config --enable-windows-desktop
-      - run: flutter build windows --release
-      - name: Zip Windows build
-        run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath alochi-maktab-windows-${{ github.ref_name }}.zip
+      - run: flutter build windows --release --dart-define=API_URL=https://api.alochi.uz
+      - name: Install Inno Setup
+        run: choco install innosetup --yes --no-progress
+      - name: Build installer
+        run: iscc windows\installer.iss
+        shell: cmd
+      - name: Rename installer
+        run: mv Output/AlochiMaktab-Setup.exe alochi-maktab-setup-${{ github.ref_name }}.exe
         shell: pwsh
       - uses: actions/upload-artifact@v4
         with:
-          name: windows-zip
-          path: alochi-maktab-windows-${{ github.ref_name }}.zip
+          name: windows-installer
+          path: alochi-maktab-setup-${{ github.ref_name }}.exe
 
   # ─── MACOS ────────────────────────────────────────────────
   macos:
@@ -86,5 +91,5 @@ jobs:
           generate_notes: true
           files: |
             alochi-maktab-${{ github.ref_name }}.apk
-            alochi-maktab-windows-${{ github.ref_name }}.zip
+            alochi-maktab-setup-${{ github.ref_name }}.exe
             alochi-maktab-macos-${{ github.ref_name }}.zip
