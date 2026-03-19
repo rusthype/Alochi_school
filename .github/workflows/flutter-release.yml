@@ -39,19 +39,14 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
       - name: Build Windows
-        run: |
-          flutter config --enable-windows-desktop
-          flutter build windows --release `
-            --dart-define=API_URL=https://api.alochi.uz
-      - name: Install Inno Setup 6
-        run: |
-          curl -L -o innosetup.exe https://jrsoftware.org/download.php/is.exe
-          Start-Process -Wait innosetup.exe -ArgumentList '/VERYSILENT /SUPPRESSMSGBOXES'
-      - name: Build installer
-        run: |
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" windows\installer.iss
+        run: flutter build windows --release --dart-define=API_URL=https://api.alochi.uz
+      - name: Build NSIS installer
+        uses: joncloud/makensis-action@v4
+        with:
+          script-file: windows/installer.nsi
       - name: Rename installer
-        run: mv Output/AlochiMaktab-Setup.exe alochi-maktab-setup-${{ github.ref_name }}.exe
+        run: mv AlochiMaktab-Setup.exe alochi-maktab-setup-${{ github.ref_name }}.exe
+        shell: pwsh
       - uses: actions/upload-artifact@v4
         with:
           name: windows-installer
