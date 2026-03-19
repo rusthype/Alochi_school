@@ -1,7 +1,7 @@
 !include "MUI2.nsh"
 
 Name "A'lochi Maktab"
-OutFile "AlochiMaktab-Setup.exe"
+OutFile "..\AlochiMaktab-Setup.exe"
 InstallDir "$PROGRAMFILES64\AlochiMaktab"
 RequestExecutionLevel admin
 
@@ -15,7 +15,7 @@ RequestExecutionLevel admin
 
 Section "Install"
   SetOutPath "$INSTDIR"
-  File /r "..\..\build\windows\x64\runner\Release\*.*"
+  File /r "..\build\windows\x64\runner\Release\*.*"
   CreateShortcut "$DESKTOP\A'lochi Maktab.lnk" "$INSTDIR\alochi_maktab.exe"
   CreateDirectory "$SMPROGRAMS\A'lochi Maktab"
   CreateShortcut "$SMPROGRAMS\A'lochi Maktab\A'lochi Maktab.lnk" "$INSTDIR\alochi_maktab.exe"
