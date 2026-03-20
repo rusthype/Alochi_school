@@ -4,11 +4,11 @@ on:
   push:
     tags: ['v*']
 
-permissions:
-  contents: write
-
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: write
 
 jobs:
 
@@ -17,8 +17,8 @@ jobs:
     name: Android APK
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with: { distribution: temurin, java-version: '17' }
       - uses: subosito/flutter-action@v2
         with: { flutter-version: '3.27.4', channel: stable, cache: true }
@@ -26,7 +26,7 @@ jobs:
       - run: flutter build apk --release --dart-define=API_URL=https://api.alochi.uz
       - name: Rename APK
         run: mv build/app/outputs/flutter-apk/app-release.apk alochi-maktab-${{ github.ref_name }}.apk
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: android-apk
           path: alochi-maktab-${{ github.ref_name }}.apk
@@ -36,7 +36,7 @@ jobs:
     name: Windows Installer
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: subosito/flutter-action@v2
         with: { flutter-version: '3.27.4', channel: stable, cache: true }
       - name: Install dependencies
@@ -53,7 +53,7 @@ jobs:
       - name: Rename installer
         run: mv AlochiMaktab-Setup.exe alochi-maktab-setup-${{ github.ref_name }}.exe
         shell: pwsh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: windows-installer
           path: alochi-maktab-setup-${{ github.ref_name }}.exe
@@ -63,7 +63,7 @@ jobs:
     name: macOS App
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: subosito/flutter-action@v2
         with: { flutter-version: '3.27.4', channel: stable, cache: true }
       - run: flutter pub get
@@ -73,7 +73,7 @@ jobs:
         run: |
           cd build/macos/Build/Products/Release
           zip -r ../../../../../alochi-maktab-macos-${{ github.ref_name }}.zip *.app
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: macos-zip
           path: alochi-maktab-macos-${{ github.ref_name }}.zip
@@ -84,7 +84,7 @@ jobs:
     needs: [android, windows, macos]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           merge-multiple: true
       - name: List downloaded files
@@ -94,7 +94,7 @@ jobs:
           name: "A'lochi Maktab ${{ github.ref_name }}"
           draft: false
           prerelease: false
-          generate_notes: true
+          generate_release_notes: true
           files: |
             alochi-maktab-${{ github.ref_name }}.apk
             alochi-maktab-setup-${{ github.ref_name }}.exe
